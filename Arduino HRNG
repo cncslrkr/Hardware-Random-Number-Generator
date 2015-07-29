@@ -1,0 +1,32 @@
+#include <Arduino.h>
+
+$Creates random bit stream based on random input from geiger counter
+
+boolean cnt = false;
+
+void setup()
+{
+  Serial.begin(57600);
+  attachInterrupt(0,GetEvent,FALLING); 
+}
+
+void loop()
+{
+  if(cnt)
+  {
+    Serial.print(1);
+    cnt = !cnt;
+  }
+  else
+  {
+  Serial.print(0);
+  }
+}
+
+void GetEvent()
+{
+  cnt = true;
+}
+
+
+  
