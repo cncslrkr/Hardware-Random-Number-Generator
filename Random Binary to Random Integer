@@ -1,0 +1,38 @@
+#creates 16 bit integers from text file of random binary
+import struct
+import math
+import numpy as np
+bs = 16
+val=''
+nc=0
+n=0
+cnt=0.0
+apxflesze=10.0**6
+rnl=[]
+with open("ran_num_57600_16b1.txt","w") as out_file:
+    with open("raw_ran_576001.txt","r") as rf:
+        while True:
+            chunk=rf.read(256)
+            if chunk=="": 
+                break
+            for i in range(int(math.floor((len(chunk)/bs))*bs)):
+                val+=chunk[i]
+                n+=1
+                if(n==bs):
+                    rnl.append(int(val,base=2))
+                    n=0
+                    val=''
+                    nc+=1
+            for item in rnl:
+                out_file.write(str(item))
+                out_file.write("\n")
+                cnt+=1
+            print "Status:  ", (100*cnt/(100681.0/8.0))
+            i=0
+            rnl=[]
+out_file.close()
+rf.close()
+
+print "Done."
+print "Random Nunbers Generated:  ", nc
+
