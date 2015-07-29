@@ -1,0 +1,54 @@
+#This Python script reads the incoming random bit stream from the micro-controller, filters the bits and saves them in a text file
+#lets grab random bits
+import serial
+import numpy as np
+import struct as st
+b=0
+n=0
+total = 24*10**6
+null_1 = np.array([1,1],int)
+null_2 = np.array([0,0],int)
+zero = np.array([0,1],int)
+one = np.array([1,0],int)
+
+sent = serial.Serial('COM6',57600)
+
+with open("raw_ran_576001.txt","w") as out_file:
+    while True:
+        filt_list = []
+        data = sent.read(size=256)          #fastest baud rate/read combo
+        data_list = np.empty(len(data))
+        for m in range(len(data)):
+            if(data[m].isdigit()==True):
+                data_list[m]=int(data[m])   #string is being converted to floats.
+            else:                           #why are there random charactars in my damn list
+                data_list[m]=0
+        det_array = np.empty(2,int)
+        while n<len(data_list)-1:
+            det_array[0] = data_list[n]
+            det_array[1] = data_list[n+1]
+            
+            if det_array[0] == null_1[0] and det_array[1] == null_1[1]:
+                n = n+2
+            elif det_array[0] == null_2[0] and det_array[1] == null_2[1]:
+                n = n+2
+            elif det_array[0] == zero[0] and det_array[1] == zero[1]:
+                filt_list.append(0)
+                n = n+2
+            elif det_array[0] == one[0] and det_array[1] == one[1]:
+                filt_list.append(1)
+                n = n+2
+            else:
+                filt_list.append(6) 
+                n=n+2
+        n=0
+        b = b+len(filt_list)
+        print float(b)/float(total)*100.0        #percent compleated
+        for item in filt_list:
+            out_file.write(str(item))       
+        if(b>total):
+            out_file.close()
+            print 'program compleat'
+            
+            break
+    
