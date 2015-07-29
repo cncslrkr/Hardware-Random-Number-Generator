@@ -1,0 +1,56 @@
+#montecarlo aprox of pi
+import numpy as np
+import math as ma
+import pylab as plt
+plt.subplot(axisbg='black')
+m=0
+n=0
+bs=16.0
+Ac=0.0
+As=0.0
+r=((2.0**bs-1.0)/2.0)
+x=np.linspace(-r,r,200)
+y=np.empty(len(x))
+with open("ran_num_57600_16b1.txt","r") as raw:
+    num_lines = sum(1 for line in open("ran_num_57600_16b1.txt"))    
+    data = np.empty([num_lines/2,2],float)
+    for line in raw:
+        data[m,n] = line
+        m+=1
+        if(m==num_lines/2):
+            m=0
+            n=1
+dc=data-r #data centered at zero
+#determine magnitude, count, color, plot
+for k in range(len(dc[:,0])):
+    mag = (dc[k,0]**2+dc[k,1]**2)**0.5
+    if(mag>r):
+        As+=1.0
+        plt.plot(dc[k,0],dc[k,1],marker=',',color='r')
+    else:
+        Ac+=1.0
+        plt.plot(dc[k,0],dc[k,1],marker=',',color='c')
+    if((As+Ac)%1000==0):
+        print "Status:   ",100.0*(Ac+As)/57717.0
+p = 4.0*(Ac/(As+Ac))
+pdif = 100*(p-ma.pi)/ma.pi
+#plot a circle to deliniate boundy
+"""
+for i, m in enumerate(x):
+    y[i] = (r**2-m**2)**0.5
+plt.plot(x,y,'y--')
+plt.plot(x,-y,'y--')
+"""
+print "number of points:  ",Ac+As
+print "Calc val PI:  ",p
+print "Error:  ",pdif
+
+plt.xlim(-r,r)
+plt.ylim(-r,r)
+title = "Monte Carlo Value of PI"
+plt.show()
+raw.close()
+
+
+    
+ 
